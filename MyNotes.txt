@@ -1,0 +1,39 @@
+What's the best way to scrape as many video urls from youku.com?
+
+My Thoughts while completing this task (youku.com):
+
+-Youku has more than 500 million unique visitors each month
+-daily video views on total over 900 million views
+-unable to find the statistic on total number of videos on youku
+
+
+Possible approaches:
+	1) For each category (music, games, tv, children, etc.) on youku.com's main page, extract all videos from that page. Then follow the trail of suggested videos to find more unique videos
+		-disadvantages: unstructured, have to make sure video url hasn't already been visited (can use a hashtable to store visited urls for efficiency), no distinct order when archiving urls
+
+	2) Each video has a corresponding channel of the user who uploaded the video. First find the channels. For each channel, find all the videos.
+		-advantages: Structured approach, know that each channel has unique videos, no need to check whether video has been archived already
+
+	3) Use soku.com (Youku's provided video search engine) to get video links and store search results directly.
+		-disadvantages: same as number 1, and what search terms to use?
+			-there are about 20 000 modern total chinese characters. Can use each character as a separate search term. Depending on how soku.com implements their search, should retrieve most of the videos.
+
+I went with the third approach in order to maximize video results (because soku.com is specifically designed by youku and would have access to their entire database of video data)
+
+I also decided to use the requests library for this task rather than using a crawling framework like Scrapy. Although depending on the scope of the project, a different approach can be taken. For example, will this run several times a day / just need the data once, will this project expand to include different sites?, how fast do we want to do this crawl?
+
+
+Current Implementation
+My current approach is a single process handling all the requests
+
+Faster approach
+Run multiple processes using a shared in memory set of urls in Redis to keep track of urls already archived.
+Also need proxy servers or a cheap external proxy service (like ProxyMesh) to bypass the timeout encountered
+
+
+For Generating the Chinese language UTF-8 charecters:
+Found here: http://www.unicode.org/charts/PDF/U4E00.pdf
+
+CJK Unified Ideographs Range is from 4E00 to 9FD5
+4E00 is 19968 in decimal
+9FD5 is 40917 in decimal
